@@ -8,14 +8,20 @@ namespace Book::Hooks
 	{
 		struct detail
 		{
-			static const char* get_gmst_string(const char* a_gmst)
+			static std::string get_gmst_string(const char* a_gmst)
 			{
-				return RE::GameSettingCollection::GetSingleton()->GetSetting(a_gmst)->GetString();
+				std::string s = RE::GameSettingCollection::GetSingleton()->GetSetting(a_gmst)->GetString();
+				return s;
 			}
 
 			static std::string get_take_or_steal(RE::TESObjectREFR* a_activator)
 			{
 				return a_activator->IsCrimeToActivate() ? get_gmst_string("sSteal") : get_gmst_string("sTake");
+			}
+
+			static std::string get_read(RE::TESObjectREFR* a_activator)
+			{
+				return a_activator->IsCrimeToActivate() ? "<font color='#FF0000'>" + get_gmst_string("sRead") + "</font>" : get_gmst_string("sRead");
 			}
 
 			static std::string get_book_text(RE::TESObjectBOOK* a_this, RE::TESObjectREFR* a_activator)
@@ -24,23 +30,23 @@ namespace Book::Hooks
 					return get_take_or_steal(a_activator);
 				} else {
 					switch (Settings::GetSingleton()->GetDefaultAction()) {
-					case kTake:
-						{
-							return !Event::Manager::GetSingleton()->GetToggleState() ? get_take_or_steal(a_activator) : get_gmst_string("sRead");
-						}
-					case kAuto:
-						{
-							if (a_this->IsRead() || a_this->TeachesSkill()) {
-								return !Event::Manager::GetSingleton()->GetToggleState() ? get_take_or_steal(a_activator) : get_gmst_string("sRead");
+						case kTake:
+							{
+								return !Event::Manager::GetSingleton()->GetToggleState() ? get_take_or_steal(a_activator) : get_read(a_activator);
 							}
-							return !Event::Manager::GetSingleton()->GetToggleState() ? get_gmst_string("sRead") : get_take_or_steal(a_activator);
-						}
-					case kRead:
-						{
-							return !Event::Manager::GetSingleton()->GetToggleState() ? get_gmst_string("sRead") : get_take_or_steal(a_activator);
-						}
-					default:
-						return get_gmst_string("sRead");
+						case kAuto:
+							{
+								if (a_this->IsRead() || a_this->TeachesSkill()) {
+									return !Event::Manager::GetSingleton()->GetToggleState() ? get_take_or_steal(a_activator) : get_read(a_activator);
+								}
+								return !Event::Manager::GetSingleton()->GetToggleState() ? get_read(a_activator) : get_take_or_steal(a_activator);
+							}
+						case kRead:
+							{
+								return !Event::Manager::GetSingleton()->GetToggleState() ? get_read(a_activator) : get_take_or_steal(a_activator);
+							}
+						default:
+							return get_read(a_activator);
 					}
 				}
 			}
