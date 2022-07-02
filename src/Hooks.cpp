@@ -30,7 +30,7 @@ namespace Book::Hooks
 						}
 					case kAuto:
 						{
-							if (a_this->IsRead()) {
+							if (a_this->IsRead() || a_this->TeachesSkill()) {
 								return !Event::Manager::GetSingleton()->GetToggleState() ? get_take_or_steal(a_activator) : get_gmst_string("sRead");
 							}
 							return !Event::Manager::GetSingleton()->GetToggleState() ? get_gmst_string("sRead") : get_take_or_steal(a_activator);
@@ -101,7 +101,7 @@ namespace Book::Hooks
 						break;
 					case kAuto:
 						{
-							if (a_this->IsRead()) {
+							if (a_this->IsRead() || a_this->TeachesSkill()) {
 								if (!Event::Manager::GetSingleton()->GetToggleState()) {
 									return detail::pick_up_book(a_this, a_targetRef, a_activatorRef, a_targetCount);
 								} else {
